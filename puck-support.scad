@@ -5,11 +5,13 @@ puck_diameter = 77;
 puck_height = 26;
 _puck_radius = puck_diameter / 2;
 
-leg_height = 95;
+
 leg_diameter = 60;
 _leg_radius = leg_diameter / 2;
 
-thickness = _puck_radius - _leg_radius;
+//thickness = _puck_radius - _leg_radius;
+thickness = 5;
+leg_height = thickness;
 
 _height = puck_height+leg_height;
 
