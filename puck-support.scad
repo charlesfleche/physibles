@@ -11,10 +11,14 @@ _leg_radius = leg_diameter / 2;
 
 thickness = _puck_radius - _leg_radius;
 
+_height = puck_height+leg_height;
+
 _epsilon = 0.001;
 
+translate([0, 0, _height])
+rotate([180, 0, 0])
 difference() {
-    cylinder(h=puck_height+leg_height, r=_puck_radius+thickness);
+    cylinder(h=_height, r=_puck_radius+thickness);
     translate([0, 0, -_epsilon])
         cylinder(h=puck_height+2*_epsilon, r=_puck_radius);
     translate([0, 0, puck_height-_epsilon])
