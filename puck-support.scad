@@ -2,7 +2,7 @@ $fa = 1;
 $fs = 0.4;
 
 puck_diameter = 77;
-puck_height = 26;
+puck_height = 26*2;
 _puck_radius = puck_diameter / 2;
 
 
