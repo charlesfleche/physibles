@@ -17,6 +17,31 @@ thickness = min_concrete_size
 
 parts = []
 
+# Triangle
+
+with BuildPart() as ex3:
+    with BuildSketch() as ex3_sk:
+        with Locations(Rotation(0, 0, 0)):
+            l = 2 * width * math.sqrt(3) / 3
+            Triangle(a=l, b=l, c=l, align=Align.CENTER)
+        with Locations(
+            (0, width / 2 / math.sqrt(3) - min_concrete_size - attach_hole_radius)
+        ):
+            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+    extrude(amount=thickness)
+    parts.append(ex3.part)
+
+with BuildPart() as ex3:
+    with BuildSketch() as ex3_sk:
+        with Locations(Rotation(0, 0, 180)):
+            l = 2 * width * math.sqrt(3) / 3
+            Triangle(a=l, b=l, c=l, align=Align.CENTER)
+        with Locations((0, width / 2 - min_concrete_size - attach_hole_radius)):
+            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+    extrude(amount=thickness)
+    parts.append(ex3.part)
+
+
 # Disk
 
 with BuildPart() as ex3:
@@ -68,31 +93,54 @@ for Shape in [
         parts.append(ex3.part)
 
 
-# Triangle
-
 with BuildPart() as ex3:
     with BuildSketch() as ex3_sk:
-        with Locations(Rotation(0, 0, 180)):
-            l = 2 * width * math.sqrt(3) / 3
-            Triangle(a=l, b=l, c=l, align=Align.CENTER)
-        with Locations((0, radius - min_concrete_size - attach_hole_radius)):
-            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+        RectangleRounded(width=width, height=width, radius=attach_hole_radius)
+        Circle(width / 4, mode=Mode.SUBTRACT)
     extrude(amount=thickness)
     parts.append(ex3.part)
 
-
 with BuildPart() as ex3:
     with BuildSketch() as ex3_sk:
-        with Locations(Rotation(0, 0, 0)):
-            l = 2 * width * math.sqrt(3) / 3
-            Triangle(a=l, b=l, c=l, align=Align.CENTER)
-        with Locations(
-            (0, radius / math.sqrt(3) - min_concrete_size - attach_hole_radius)
-        ):
-            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+        Rectangle(width=width, height=width)
+        Rectangle(width=width / 3, height=width / 3, mode=Mode.SUBTRACT)
     extrude(amount=thickness)
     parts.append(ex3.part)
 
+with BuildPart() as ex3:
+    with BuildSketch() as ex3_sk:
+        Circle(radius=width / 2)
+        Circle(width / 6, mode=Mode.SUBTRACT)
+    extrude(amount=thickness)
+    parts.append(ex3.part)
+
+with BuildPart() as ex3:
+    with BuildSketch() as ex3_sk:
+        Circle(radius=width / 2)
+        Rectangle(width=width / 3, height=width / 3, mode=Mode.SUBTRACT)
+    extrude(amount=thickness)
+    parts.append(ex3.part)
+
+for _ in range(2):
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            Rectangle(width=width / 2, height=width / 2)
+        extrude(amount=thickness)
+        parts.append(ex3.part)
+
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            RectangleRounded(
+                width=width / 2, height=width / 2, radius=attach_hole_radius
+            )
+        extrude(amount=thickness)
+        parts.append(ex3.part)
+
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            Circle(radius=width / 4)
+        extrude(amount=thickness)
+        parts.append(ex3.part)
 
 z_pack = pack(parts, padding=mold_wall_size, align_z=True)
 show(z_pack)
