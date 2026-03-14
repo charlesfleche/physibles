@@ -4,7 +4,9 @@
 
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
-		"bernhard-42.ocp-cad-viewer"
+		"bernhard-42.ocp-cad-viewer",
+		"ms-python.python",
+		"charliermarsh.ruff"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": [

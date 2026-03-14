@@ -1,5 +1,8 @@
-from pathlib import Path
-from ocp_vscode import show, show_object, reset_show, set_port, set_defaults, get_defaults
+import functools
+import math
+
+from ocp_vscode import set_port, show
+
 set_port(3939)
 
 from build123d import *
@@ -10,7 +13,7 @@ min_concrete_size = 3.0 * MM
 attach_hole_diameter = 2.2 * MM
 attach_hole_radius = attach_hole_diameter
 width = 30.0 * MM
-thickness = min_concrete_size * 3
+thickness = min_concrete_size
 
 parts = []
 
@@ -19,35 +22,50 @@ parts = []
 with BuildPart() as ex3:
     with BuildSketch() as ex3_sk:
         radius = width / 2.0
-        Circle(width/2.0, align=Align.CENTER)
+        Circle(width / 2.0, align=Align.CENTER)
         with Locations((0, radius - min_concrete_size - attach_hole_radius)):
             Circle(attach_hole_radius, mode=Mode.SUBTRACT)
     extrude(amount=thickness)
     parts.append(ex3.part)
 
 
-# Square straight
+for Shape in [
+    Rectangle,
+    functools.partial(RectangleRounded, radius=attach_hole_radius),
+]:
+    # Square straight
 
-with BuildPart() as ex3:
-    with BuildSketch() as ex3_sk:
-        radius = width / 2.0
-        Rectangle(width, width, align=Align.CENTER)
-        with Locations((0, radius - min_concrete_size - attach_hole_radius)):
-            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
-    extrude(amount=thickness)
-    parts.append(ex3.part)
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            radius = width / 2.0
+            Shape(width, width, align=Align.CENTER)
+            with Locations((0, radius - min_concrete_size - attach_hole_radius)):
+                Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+        extrude(amount=thickness)
+        parts.append(ex3.part)
 
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            radius = width / 2.0
+            Shape(width, width * 2, align=Align.CENTER)
+            with Locations((0, width - min_concrete_size - attach_hole_radius)):
+                Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+        extrude(amount=thickness)
+        parts.append(ex3.part)
 
-# Square up straight
+    # Square up straight
 
-with BuildPart() as ex3:
-    with BuildSketch() as ex3_sk:
-        with Locations(Rotation(0, 0, 45)):
-            Rectangle(width, width, align=Align.CENTER)
-        with Locations((0, radius - min_concrete_size - attach_hole_radius)):
-            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
-    extrude(amount=thickness)
-    parts.append(ex3.part)
+    with BuildPart() as ex3:
+        with BuildSketch() as ex3_sk:
+            l = width / math.sqrt(2)
+            with Locations(Rotation(0, 0, 45)):
+                Shape(l, l, align=Align.CENTER)
+            with Locations(
+                (0, (width / 2 - min_concrete_size) / math.sqrt(2) - attach_hole_radius)
+            ):
+                Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+        extrude(amount=thickness)
+        parts.append(ex3.part)
 
 
 # Triangle
@@ -55,8 +73,22 @@ with BuildPart() as ex3:
 with BuildPart() as ex3:
     with BuildSketch() as ex3_sk:
         with Locations(Rotation(0, 0, 180)):
-            Triangle(a=width, b=width, c=width, align=Align.CENTER)
+            l = 2 * width * math.sqrt(3) / 3
+            Triangle(a=l, b=l, c=l, align=Align.CENTER)
         with Locations((0, radius - min_concrete_size - attach_hole_radius)):
+            Circle(attach_hole_radius, mode=Mode.SUBTRACT)
+    extrude(amount=thickness)
+    parts.append(ex3.part)
+
+
+with BuildPart() as ex3:
+    with BuildSketch() as ex3_sk:
+        with Locations(Rotation(0, 0, 0)):
+            l = 2 * width * math.sqrt(3) / 3
+            Triangle(a=l, b=l, c=l, align=Align.CENTER)
+        with Locations(
+            (0, radius / math.sqrt(3) - min_concrete_size - attach_hole_radius)
+        ):
             Circle(attach_hole_radius, mode=Mode.SUBTRACT)
     extrude(amount=thickness)
     parts.append(ex3.part)
