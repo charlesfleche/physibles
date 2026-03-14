@@ -1,7 +1,8 @@
 import functools
 import math
+from pathlib import Path
 
-from ocp_vscode import set_port, show
+from ocp_vscode import set_port, show_object
 
 set_port(3939)
 
@@ -143,24 +144,43 @@ for _ in range(2):
         parts.append(ex3.part)
 
 z_pack = pack(parts, padding=mold_wall_size, align_z=True)
-show(z_pack)
+# show(z_pack)
 # show_object(ex3_sk)
 
-# bbox = part.bounding_box()
-# silicon_mold = Box(
-#     bbox.max.X - bbox.min.X + 2 * mold_wall_size,
-#     bbox.max.Y - bbox.min.Y + 2 * mold_wall_size,
-#     bbox.max.Z  + mold_wall_size,
-#     align=(Align.CENTER, Align.CENTER, Align.MIN)
-# )
-# silicon_mold -= part
+with BuildPart() as positive:
+    # Adding a list of objects directly to the part
+    add(z_pack)
+bbox = positive.part.bounding_box()
+
+with BuildPart() as silicon_mold:
+    center = bbox.center()
+    with Locations((center.X, center.Y, 0)):
+        Box(
+            bbox.size.X + 2 * mold_wall_size,
+            bbox.size.Y + 2 * mold_wall_size,
+            bbox.size.Z + mold_wall_size,
+            align=(Align.CENTER, Align.CENTER, Align.MIN),
+        )
+silicon_mold.part -= positive.part
+
+bbox = silicon_mold.part.bounding_box()
+with BuildPart() as mold:
+    center = bbox.center()
+    with Locations((center.X, center.Y, -mold_wall_size)):
+        Box(
+            bbox.size.X + 2 * mold_wall_size,
+            bbox.size.Y + 2 * mold_wall_size,
+            bbox.size.Z + mold_wall_size,
+            align=(Align.CENTER, Align.CENTER, Align.MIN),
+        )
+mold.part -= silicon_mold.part
 
 # bbox = silicon_mold.bounding_box()
 # mold = Box(
 #     bbox.max.X - bbox.min.X + 2 * mold_wall_size,
 #     bbox.max.Y - bbox.min.Y + 2 * mold_wall_size,
 #     bbox.max.Z + mold_base_size,
-#     align=(Align.CENTER, Align.CENTER, Align.MIN)
+#     align=(Align.CENTER, Align.CENTER, Align.MIN),
 # )
 # mold -= silicon_mold
 
@@ -175,10 +195,11 @@ show(z_pack)
 # )
 # show(z_pack)
 # show_object(part)
+# show_object(positive)
 # show_object(silicon_mold)
-# show_object(mold)
+show_object(mold)
 # show(part)
 # show(silicon_mold)
 # show(mold)
 
-# export_stl(part, Path(__file__).with_suffix(".stl"))
+export_stl(mold.part, Path(__file__).with_name("mold.stl"))
