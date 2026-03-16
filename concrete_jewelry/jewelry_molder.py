@@ -13,7 +13,7 @@ mold_base_size = mold_wall_size / 2.0
 min_concrete_size = 3.0 * MM
 attach_hole_diameter = 2.2 * MM
 attach_hole_radius = attach_hole_diameter
-width = 30.0 * MM
+width = 20.0 * MM
 thickness = min_concrete_size
 
 parts = []
